@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Proactivas</title>
+<meta name="theme-color" content="#1F2328">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--ink:#1F2328;--paper:#EEF1F4;--card:#FFFFFF;--red:#C00000;--green:#1D9E75;--amber:#D99A00;--muted:#5F6B78;
+  --line:#DDE2E7;--asfalto:#3A3F45;--franja:#F2C230;--r:14px}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;font-size:16px;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid #2F6FB3;outline-offset:2px}
+.hidden{display:none!important}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.badge{display:inline-block;background:var(--red);color:#fff;font-weight:700;font-size:12px;letter-spacing:.08em;padding:4px 9px;border-radius:4px}
+
+/* Login (misma estética que admin) */
+#login{min-height:100vh;display:grid;place-items:center;background:var(--ink);padding:20px}
+#login .box{background:#fff;border-radius:14px;padding:28px;width:min(380px,100%)}
+#login h1{margin:12px 0 4px;font-size:26px}
+#login p{margin:0 0 14px;color:var(--muted);font-size:15px}
+#login label{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px}
+#login input,#login select{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:17px}
+#login .btn{margin-top:18px;width:100%;border:0;border-radius:8px;padding:13px;background:var(--red);color:#fff;font-weight:700;font-size:17px}
+#lErr{color:var(--red);min-height:20px;margin-top:10px;font-size:14px}
+
+/* Shell */
+header.top{position:sticky;top:0;z-index:5;background:var(--ink);color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;display:flex;align-items:center;gap:10px}
+header.top .tt{font-weight:700;font-size:18px;flex:1}
+header.top .usr{font-size:13px;color:#B9C1CA;text-align:right}
+header.top .usr button{background:none;border:1px solid #4A525B;color:#fff;border-radius:6px;padding:3px 8px;margin-left:6px;font-size:12px}
+.off{background:#FFF4D6;color:#7A5A00;font-size:14px;padding:8px 16px;border-bottom:1px solid #F0DDA0}
+main{max-width:720px;margin:0 auto;padding:16px 14px calc(96px + env(safe-area-inset-bottom,0px))}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav.tabs button{flex:1;border:0;background:none;padding:9px 0 10px;color:var(--muted);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
+nav.tabs button.on{color:var(--red);font-weight:700}
+nav.tabs .dot{position:absolute;top:5px;left:calc(50% + 8px);min-width:17px;height:17px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;line-height:17px;padding:0 4px;font-weight:700}
+h2{font-size:20px;margin:26px 0 10px}
+.panel{background:var(--card);border-radius:var(--r);padding:16px;border:1px solid var(--line)}
+.btnp{border:0;border-radius:10px;padding:12px 16px;background:var(--red);color:#fff;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+.btns{border:1px solid var(--line);border-radius:10px;padding:11px 16px;background:#fff;color:var(--ink);display:inline-flex;align-items:center;gap:8px}
+
+/* Inicio */
+.hero{display:flex;gap:18px;align-items:center}
+.ring{width:124px;height:124px;flex:none}
+.ring .rn{font-size:40px;font-weight:700;fill:var(--ink)}
+.ring .rd{font-size:14px;fill:var(--muted)}
+.hero h1{font-size:22px;line-height:1.15;margin:0 0 6px}
+.hero p{margin:0;color:var(--muted);line-height:1.35}
+.racha{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.racha div{font-size:12px;padding:4px 9px;border-radius:20px;background:#EDEFF2;color:var(--muted)}
+.racha .ok{background:#DDF3EA;color:#146B50}
+.racha .no{background:#FBE1E1;color:#8E1515}
+.nuevas{display:flex;align-items:center;gap:14px}
+.nuevas .n{font-size:40px;font-weight:700;line-height:1;color:var(--red);font-variant-numeric:tabular-nums}
+.nuevas .n.cero{color:var(--green)}
+.nuevas p{margin:0;flex:1;line-height:1.3}
+.nuevas-acc{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.temas{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none}
+.temas button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:7px;width:76px;flex:none;font-size:12px;color:var(--ink);text-align:center;line-height:1.15;padding:0}
+.tile{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:color-mix(in srgb,var(--tc) 13%,#fff);color:var(--tc);border:1px solid color-mix(in srgb,var(--tc) 25%,#fff)}
+.tile .ic{width:28px;height:28px}
+.temas .cnt{font-size:11px;color:var(--muted)}
+.hot{display:grid;gap:10px}
+.hot .row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:15px}
+.hot .row .b{grid-column:1/3;height:8px;border-radius:4px;background:#E4E7EB;overflow:hidden}
+.hot .row .b i{display:block;height:100%;background:var(--asfalto)}
+.hot .row strong{font-variant-numeric:tabular-nums}
+
+/* Ruta */
+.mapa{background:var(--card);border-radius:var(--r);border:1px solid var(--line);padding:6px 4px}
+.mapa svg{width:100%;height:auto;display:block}
+.mapa .node{cursor:pointer}
+.leyenda{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:10px 4px}
+.leyenda i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:3px solid}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:7px 13px;font-size:14px;margin:4px 6px 4px 0;color:var(--ink)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* Tarjetas */
+.lista{display:grid;gap:12px}
+.card{background:var(--card);border-radius:var(--r);border:1px solid var(--line);overflow:hidden}
+.card.dest{box-shadow:0 0 0 2px var(--red)}
+.card .ch{display:flex;gap:12px;padding:14px 14px 6px;align-items:flex-start}
+.card .tile{width:46px;height:46px;border-radius:13px}
+.card .tile .ic{width:24px;height:24px}
+.card h3{margin:0 0 4px;font-size:17px;line-height:1.2}
+.card .meta{font-size:13px;color:var(--muted);display:flex;gap:4px 12px;flex-wrap:wrap;align-items:center}
+.card .meta span{display:inline-flex;align-items:center;gap:3px}
+.card .meta .ic{width:14px;height:14px}
+.card .bk{padding:4px 14px 10px}
+.card .bk b{display:block;font-size:13px;color:var(--muted);margin-bottom:2px}
+.card .bk p{margin:0;line-height:1.38}
+.card .bk.hacer{background:#F6F8FA;padding-top:10px;border-top:1px solid var(--line)}
+.card .bk.hacer b{color:#146B50}
+.card .tags{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px 12px}
+.tag{font-size:12px;padding:3px 8px;border-radius:12px;background:#EDEFF2;color:var(--muted)}
+.tag.nueva{background:var(--red);color:#fff;font-weight:700}
+.tag.mia{background:#FFF4D6;color:#7A5A00}
+.tag.dst{background:#FBE1E1;color:#8E1515}
+.filtros{position:sticky;top:52px;z-index:3;background:var(--paper);padding:6px 0 8px}
+.filtros .fila{display:flex;gap:8px;margin-top:6px}
+.filtros input,.filtros select{flex:1;min-width:0;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:#fff}
+.chips{white-space:nowrap;overflow-x:auto;scrollbar-width:none}
+.fab{position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:7;border:0;border-radius:28px;background:var(--red);color:#fff;font-weight:700;padding:14px 18px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(192,0,0,.35)}
+.pend{background:#FFF4D6;color:#7A5A00;border:1px solid #F0DDA0;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+.nf{position:fixed;inset:0;z-index:30;background:var(--paper);overflow:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.nf header{position:sticky;top:0;z-index:2;background:var(--ink);color:#fff;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px 16px;display:flex;align-items:center;gap:10px}
+.nf header .tt{flex:1;font-weight:700;font-size:18px}
+.nf header button{background:none;border:0;color:#fff;display:grid;place-items:center;padding:4px}
+.nf .in{max-width:640px;margin:0 auto;padding:16px 14px}
+.nf .guia{color:var(--muted);line-height:1.4;margin:0 0 6px}
+.nf .ej{font-size:14px;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:16px;line-height:1.35}
+.mic{display:flex;flex-direction:column;align-items:center;gap:10px;margin:8px 0 16px}
+.mic button{width:96px;height:96px;border-radius:50%;border:0;background:var(--red);color:#fff;display:grid;place-items:center;box-shadow:0 4px 18px rgba(192,0,0,.35)}
+.mic button .ic{width:40px;height:40px}
+.mic button.on{background:var(--ink);animation:pulso 1.4s ease-in-out infinite}
+@keyframes pulso{0%,100%{box-shadow:0 0 0 0 rgba(192,0,0,.45)}50%{box-shadow:0 0 0 16px rgba(192,0,0,0)}}
+@media (prefers-reduced-motion:reduce){.mic button.on{animation:none}}
+.mic .st{font-size:14px;color:var(--muted);text-align:center;min-height:20px}
+.nf textarea,.nf input,.nf select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:16px}
+.nf textarea{min-height:130px;resize:vertical;line-height:1.4}
+.nf label{display:block;font-size:13px;color:var(--muted);margin:14px 0 4px}
+.nf .fila2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.nf .acc{display:flex;gap:10px;margin-top:20px}
+.nf .acc button{flex:1;justify-content:center}
+.nf .aviso{background:#E6EEF8;color:#24578F;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.35;margin-bottom:6px}
+.nf details{margin-top:14px;font-size:14px;color:var(--muted)}
+.nf details p{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--ink)}
+.nf .err{color:var(--red);font-size:14px;margin-top:8px;min-height:18px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;z-index:40;font-size:15px;max-width:90vw;text-align:center}
+.vacio{padding:26px 16px;text-align:center;color:var(--muted);background:#fff;border-radius:var(--r);border:1px dashed var(--line)}
+
+/* Proactivas de la flota (visor) */
+.story{position:fixed;inset:0;z-index:20;background:var(--sc,#1F2328);color:#fff;display:flex;flex-direction:column;padding:calc(12px + env(safe-area-inset-top,0px)) 18px calc(20px + env(safe-area-inset-bottom,0px))}
+.story .bars{display:flex;gap:3px}
+.story .bars div{flex:1;height:3px;background:rgba(255,255,255,.35);border-radius:2px;overflow:hidden}
+.story .bars i{display:block;height:100%;width:0;background:#fff}
+.story .bars .done i{width:100%}
+.story .bars .cur i{animation:llenar 9s linear forwards}
+@keyframes llenar{to{width:100%}}
+.story .sh{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:14px;opacity:.9;position:relative;z-index:2}
+.story .sh button{background:none;border:0;color:#fff;padding:4px;display:grid;place-items:center}
+.story .sh .ic{width:28px;height:28px}
+.story .sb{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:560px;margin:0 auto;width:100%}
+.story .big{width:72px;height:72px;border-radius:20px;background:rgba(255,255,255,.16);display:grid;place-items:center}
+.story .big .ic{width:40px;height:40px;stroke-width:1.6}
+.story .ubi{margin-top:18px;font-size:15px;opacity:.9;display:flex;gap:5px;align-items:center}
+.story .ubi .ic{width:16px;height:16px}
+.story h2{font-size:30px;line-height:1.1;margin:6px 0 16px}
+.story p{font-size:18px;line-height:1.4;margin:0 0 18px}
+.story .hacer{background:rgba(255,255,255,.14);border-radius:12px;padding:14px;font-size:17px;line-height:1.4}
+.story .hacer b{display:block;font-size:14px;opacity:.85;margin-bottom:4px}
+.story .nav{display:flex;justify-content:space-between;position:relative;z-index:2}
+.story .nav button{background:rgba(255,255,255,.16);border:0;color:#fff;border-radius:10px;padding:10px 16px;display:inline-flex;gap:6px;align-items:center}
+.story .tap{position:absolute;top:80px;bottom:80px;width:35%;z-index:1}
+.story .tap.l{left:0}.story .tap.r{right:0;width:65%}
+@media (prefers-reduced-motion:reduce){.story .bars .cur i{animation:none;width:100%}}
+</style>
+</head>
+<body>
+
+<section id="login"><div class="box">
+  <span class="badge">GRIFFOULIERE</span>
+  <h1>Proactivas</h1>
+  <p>Lo que ven los conductores en la ruta, para cuidarnos entre todos.</p>
+  <label for="iNom">Conductor</label>
+  <select id="iNom"><option value="">Cargando…</option></select>
+  <label for="iDni">DNI</label>
+  <input id="iDni" inputmode="numeric" autocomplete="off" placeholder="Sin puntos">
+  <button class="btn" id="bIn">Ingresar</button>
+  <div id="lErr" role="alert"></div>
+</div></section>
+
+<div id="app" class="hidden">
+  <header class="top">
+    <span class="badge">GRIFFOULIERE</span>
+    <div class="tt">Proactivas</div>
+    <div class="usr"><span id="uNom"></span><button id="bOut">Salir</button></div>
+  </header>
+  <div id="offBar" class="off hidden">Sin conexión. Estás viendo la información guardada en el teléfono.</div>
+  <main>
+    <section id="v-inicio"></section>
+    <section id="v-ruta" class="hidden"></section>
+    <section id="v-muro" class="hidden"></section>
+    <section id="v-mias" class="hidden"></section>
+  </main>
+  <nav class="tabs" id="nav"></nav>
+</div>
+
+<button class="fab hidden" id="fab"></button>
+<section id="nf" class="nf hidden" role="dialog" aria-label="Nueva proactiva">
+  <header><div class="tt">Nueva proactiva</div><button id="nfClose" aria-label="Cerrar"></button></header>
+  <div class="in">
+    <div id="nf1">
+      <p class="guia">Tocá el micrófono y contá en un solo mensaje <b>dónde estás, qué viste y qué harías para solucionarlo</b>. También podés escribirlo.</p>
+      <div class="ej">Ejemplo: "En la playa de Arroyo Seco hay pozos muy grandes en el ingreso, al bajar del camión casi me tuerzo el tobillo. Habría que rellenarlos."</div>
+      <div class="mic"><button id="nfMic" aria-label="Grabar mensaje de voz"></button><div class="st" id="nfSt">Tocá para hablar</div></div>
+      <label for="nfTxt">Tu mensaje</label>
+      <textarea id="nfTxt" placeholder="Lo que digas aparece acá. Podés corregirlo o escribirlo directamente."></textarea>
+      <div class="acc"><button class="btnp" id="nfArmar" disabled>Armar proactiva</button></div>
+    </div>
+    <div id="nf2" class="hidden">
+      <div class="aviso">Completamos los datos a partir de tu mensaje. Revisalos y corregí lo que haga falta antes de enviar.</div>
+      <label for="nfTit">Título</label><input id="nfTit" maxlength="90">
+      <label for="nfUbi">Ubicación</label><input id="nfUbi" maxlength="120" placeholder="Ej.: Planta Arroyo Seco, RN 33 km 603">
+      <div class="fila2"><div><label for="nfAmb">Dónde fue</label><select id="nfAmb"></select></div><div><label for="nfZona">Zona del corredor</label><select id="nfZona"></select></div></div>
+      <div class="fila2"><div><label for="nfTema">Tema</label><select id="nfTema"></select></div><div><label for="nfClase">Tipo</label><select id="nfClase"></select></div></div>
+      <label for="nfProb">Qué viste</label><textarea id="nfProb"></textarea>
+      <label for="nfSug">Qué harías para solucionarlo</label><textarea id="nfSug" style="min-height:90px"></textarea>
+      <details><summary>Ver tu mensaje original</summary><p id="nfOrig"></p></details>
+      <div class="err" id="nfErr"></div>
+      <div class="acc"><button class="btns" id="nfVolver">Volver al mensaje</button><button class="btnp" id="nfEnviar">Enviar</button></div>
+    </div>
+  </div>
+</section>
+<div id="story" class="story hidden" role="dialog" aria-label="Proactivas de la flota">
+  <div class="bars" id="sBars"></div>
+  <div class="sh"><span id="sCont"></span><button id="sClose" aria-label="Cerrar"></button></div>
+  <div class="sb" id="sBody"></div>
+  <div class="nav"><button id="sPrevB"></button><button id="sNextB"></button></div>
+  <div class="tap l" id="sPrev"></div><div class="tap r" id="sNext"></div>
+</div>
+
+<script>
+/* ---------- Íconos (línea, 24x24) ---------- */
+const ICP={
+ home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-5.5h4V21"/>',
+ ruta:'<path d="M9 4 3 6.2v13.8l6-2.2 6 2.2 6-2.2V4l-6 2.2z"/><path d="M9 4v13.8M15 6.2V20"/>',
+ muro:'<rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.6-3.8 4.5-5.8 8-5.8s6.4 2 8 5.8"/>',
+ pin:'<path d="M12 21s-7-6.1-7-11.2a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.4"/>',
+ cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+ x:'<path d="M6 6l12 12M18 6 6 18"/>',
+ prev:'<path d="M15 18 9 12l6-6"/>', next:'<path d="m9 18 6-6-6-6"/>',
+ play:'<path d="M7 4.5v15l12-7.5z"/>',
+ grid:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
+ check:'<circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.7 2.7L16.2 9.5"/>',
+ compass:'<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
+ star:'<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',
+ /* temas */
+ 'Calzada':'<path d="M8.5 3 4 21M15.5 3 20 21"/><path d="M12 4.5v2.5M12 10v3M12 16.5V20"/>',
+ 'Animales sueltos':'<circle cx="6.5" cy="10.5" r="1.7"/><circle cx="10" cy="6.5" r="1.7"/><circle cx="14" cy="6.5" r="1.7"/><circle cx="17.5" cy="10.5" r="1.7"/><path d="M12 12.2c-2.8 0-5 2.9-5 5 0 1.5 1.1 2.3 2.4 2.3 1 0 1.7-.5 2.6-.5s1.6.5 2.6.5c1.3 0 2.4-.8 2.4-2.3 0-2.1-2.2-5-5-5z"/>',
+ 'Obras y desvíos':'<path d="M10.2 3h3.6l4.7 16H5.5z"/><path d="M8.3 9.5h7.4M6.9 14.5h10.2"/><path d="M3 19h18"/>',
+ 'Señalización':'<path d="M12 3v18"/><path d="M5 5.5h11l3 3-3 3H5z"/><path d="M8.5 21h7"/>',
+ 'Instalaciones':'<path d="M4 21V8.5L12 4l8 4.5V21"/><path d="M9.5 21v-5h5v5"/><path d="M8 11h2M14 11h2"/><path d="M2.5 21h19"/>',
+ 'Equipos de carga y descarga':'<path d="M14.6 6.2a4 4 0 0 0-5.3 5.2L3.5 17.2a1.8 1.8 0 0 0 2.6 2.6l5.8-5.8a4 4 0 0 0 5.2-5.3l-2.4 2.4-2.3-.6-.6-2.3z"/>',
+ 'Operación y demoras':'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.8"/><path d="M9.5 2.5h5"/>',
+ 'Paradas y descanso':'<rect x="4" y="3" width="16" height="18" rx="3.5"/><path d="M10 17V7.5h3.2a2.7 2.7 0 0 1 0 5.4H10"/>',
+ 'Elementos de seguridad':'<path d="M12 3 5 6v5.5c0 4.3 3 8 7 9.5 4-1.5 7-5.2 7-9.5V6z"/><path d="m9 12 2.2 2.2L15.5 10"/>',
+ 'Terceros en la vía':'<path d="M10.3 4 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4.5M12 17.2v.1"/>',
+ 'Capacitación':'<path d="M9.5 18h5M10.3 21h3.4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2v.2h5V16c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/>',
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>',
+ stop:'<rect x="7" y="7" width="10" height="10" rx="2"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ truck:'<rect x="2" y="6" width="12" height="10" rx="1.5"/><path d="M14 9.5h4l3 3.2V16h-7z"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>'
+};
+const ico=(k,cls)=>`<svg class="ic ${cls||''}" viewBox="0 0 24 24" aria-hidden="true">${ICP[k]||ICP['Terceros en la vía']}</svg>`;
+const TEMA_COL={'Calzada':'#7A5C3E','Animales sueltos':'#A0701A','Obras y desvíos':'#D27A00','Señalización':'#2F6FB3','Instalaciones':'#56687A',
+ 'Equipos de carga y descarga':'#6A4FB3','Operación y demoras':'#A23B3B','Paradas y descanso':'#157A87','Elementos de seguridad':'#C9571A',
+ 'Terceros en la vía':'#B3263E','Capacitación':'#2E8B57'};
+const tcol=t=>TEMA_COL[t]||'#5F6B78';
+
+const LS={tok:'pq_tok',nom:'pq_nom',data:'pq_data',cola:'pq_cola',vistos:'pq_vistos',vcola:'pq_vcola',ncola:'pq_ncola',nerr:'pq_nerr'};
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MES_C=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const ZONA_UI={'Arroyo Seco':{y:50,l:['Arroyo Seco','Planta de carga']},'RN 33 Firmat–Venado Tuerto':{y:122,l:['RN 33','Firmat–Venado Tuerto']},
+ 'RN 33 Rufino':{y:194,l:['RN 33','Venado T.–Rufino']},'RN 7 Laboulaye–Vicuña Mackenna':{y:266,l:['RN 7','Laboulaye–V. Mackenna']},
+ 'Villa Mercedes':{y:338,l:['Villa Mercedes','Diaser Etanol']},'San Luis':{y:410,l:['San Luis','La Cumbre, Diaser FAME']},
+ 'Desaguadero–La Paz':{y:500,l:['Desaguadero','La Paz, Las Catitas']},'Gran Mendoza':{y:580,l:['Gran Mendoza','Descargas y accesos']},
+ 'San Juan':{x:300,y:490,l:['San Juan','RN 20 y RN 147']}};
+const GEN='Otras rutas y generales';
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let D=null,zonaSel=null,filtro={amb:'Todos',tema:'',q:'',solo:''},VISTOS=new Set();
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ymLocal=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+const fDia=s=>{if(!s)return'';const[,m,d]=s.split('-');return +d+' '+MES_C[+m-1]};
+const mesNom=ym=>MESES[+ym.split('-')[1]-1];
+const EXEC='https://script.google.com/macros/s/AKfycbxPHED_rxQKelDmHGwMNPHN7IvKi21mlbQ1hw-8kQ3hCpNDyKqAjThlo3tBBRV3hd6p/exec';
+async function run(fn,...args){
+  const r=await fetch(EXEC,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn,args})});
+  const j=await r.json();if(!j.ok)throw new Error(j.error||'Error del servidor');return j.data;
+}
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+function lsGet(k,def){try{const v=localStorage.getItem(k);return v==null?def:JSON.parse(v)}catch(e){return def}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+
+/* ---------- Íconos fijos ---------- */
+$('#nav').innerHTML=[['inicio','home','Inicio'],['ruta','ruta','Ruta'],['muro','muro','Muro'],['mias','user','Mías']]
+ .map(([v,i,t],k)=>`<button data-v="${v}" class="${k?'':'on'}">${ico(i)}${t}${v==='muro'?'<span class="dot hidden" id="dotMuro"></span>':''}</button>`).join('');
+$('#sClose').innerHTML=ico('x');$('#sPrevB').innerHTML=ico('prev')+'Anterior';$('#sNextB').innerHTML='Siguiente'+ico('next');
+
+/* ---------- Registro de accesos y visualizaciones (con cola sin conexión) ---------- */
+function logEv(ev,det){const c=lsGet(LS.cola,[]);c.push({ts:Date.now(),ev,det:det||'',off:!navigator.onLine});lsSet(LS.cola,c.slice(-300));flush()}
+function marcarVisto(id,src){
+  if(!id||VISTOS.has(id))return;
+  VISTOS.add(id);lsSet(LS.vistos,[...VISTOS]);
+  const c=lsGet(LS.vcola,[]);c.push({ts:Date.now(),id,src,off:!navigator.onLine});lsSet(LS.vcola,c.slice(-1000));
+  actualizarNuevas();clearTimeout(window._vf);window._vf=setTimeout(flush,2500);
+}
+let enviando=false;
+function flush(){
+  const tok=lsGet(LS.tok,null);if(enviando||!tok||!navigator.onLine)return;
+  const c=lsGet(LS.cola,[]),v=lsGet(LS.vcola,[]);if(!c.length&&!v.length)return;
+  enviando=true;const nc=c.length,nv=v.length;
+  Promise.all([nc?run('apiLog',tok,c):null,nv?run('apiVistas',tok,v):null])
+   .then(()=>{lsSet(LS.cola,lsGet(LS.cola,[]).slice(nc));lsSet(LS.vcola,lsGet(LS.vcola,[]).slice(nv))})
+   .catch(()=>{}).finally(()=>{enviando=false});
+}
+let enviandoN=false;
+function flushNuevas(){
+  const tok=lsGet(LS.tok,null),c=lsGet(LS.ncola,[]);
+  if(enviandoN||!tok||!c.length||!navigator.onLine)return;
+  enviandoN=true;const n=c.length;
+  run('apiNuevaProactiva',tok,c).then(()=>{lsSet(LS.ncola,lsGet(LS.ncola,[]).slice(n));lsDel(LS.nerr);toast(n===1?'Tu proactiva se envió. ¡Gracias!':`Se enviaron ${n} proactivas. ¡Gracias!`);refrescar()})
+   .catch(e=>{lsSet(LS.nerr,String(e.message||e).replace('SESION: ',''));if(D)render()})
+   .finally(()=>{enviandoN=false});
+}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3200)}
+addEventListener('online',()=>{$('#offBar').classList.add('hidden');flush();flushNuevas();refrescar()});
+addEventListener('offline',()=>$('#offBar').classList.remove('hidden'));
+
+/* Una proactiva se cuenta como vista cuando queda en pantalla 1,5 segundos */
+const obs=('IntersectionObserver' in window)?new IntersectionObserver(ents=>ents.forEach(en=>{
+  const el=en.target;
+  if(en.isIntersecting){el._t=setTimeout(()=>{marcarVisto(el.dataset.id,el.dataset.src);obs.unobserve(el)},1500)}
+  else clearTimeout(el._t);
+}),{threshold:.6}):null;
+function observar(root){if(!obs)return;root.querySelectorAll('.card[data-id]').forEach(el=>{if(!VISTOS.has(el.dataset.id))obs.observe(el)})}
+
+/* ---------- Login ---------- */
+function cargarNombres(){
+  const cache=lsGet('pq_lista',null);if(cache)llenarNombres(cache);
+  if(!navigator.onLine){if(!cache)$('#lErr').textContent='Para el primer ingreso necesitás conexión.';return}
+  run('apiListaChoferes').then(l=>{lsSet('pq_lista',l);llenarNombres(l)}).catch(()=>{$('#lErr').textContent='No se pudo cargar la lista de conductores.'});
+}
+function llenarNombres(l){const v=$('#iNom').value;$('#iNom').innerHTML='<option value="">Elegí tu nombre</option>'+l.map(n=>`<option ${n===v?'selected':''}>${esc(n)}</option>`).join('')}
+$('#bIn').onclick=async()=>{
+  const nom=$('#iNom').value,dni=$('#iDni').value.replace(/\D/g,'');
+  if(!nom||!dni){$('#lErr').textContent='Elegí tu nombre y escribí tu DNI.';return}
+  if(!navigator.onLine){$('#lErr').textContent='Para ingresar necesitás conexión.';return}
+  $('#bIn').disabled=true;$('#lErr').textContent='Ingresando…';
+  try{const r=await run('apiLogin',nom,dni);lsSet(LS.tok,r.token);lsSet(LS.nom,r.nombre);$('#lErr').textContent='';iniciar()}
+  catch(e){$('#lErr').textContent=String(e.message||e).replace('SESION: ','')}
+  finally{$('#bIn').disabled=false}
+};
+$('#iDni').addEventListener('keydown',e=>{if(e.key==='Enter')$('#bIn').click()});
+$('#bOut').onclick=()=>{logEv('Salida');setTimeout(()=>{[LS.tok,LS.nom,LS.data,LS.vistos].forEach(lsDel);location.reload()},400)};
+
+function iniciar(){
+  $('#login').classList.add('hidden');$('#app').classList.remove('hidden');
+  $('#uNom').textContent=(lsGet(LS.nom,'')||'').split(' ').slice(0,2).join(' ');
+  VISTOS=new Set(lsGet(LS.vistos,[]));
+  if(!navigator.onLine)$('#offBar').classList.remove('hidden');
+  const c=lsGet(LS.data,null);if(c){D=c;render()}else $('#v-inicio').innerHTML='<div class="vacio">Cargando proactivas…</div>';
+  logEv('Apertura');refrescar();flushNuevas();
+}
+function refrescar(){
+  const tok=lsGet(LS.tok,null);if(!tok||!navigator.onLine)return;
+  run('apiDatosChofer',tok).then(d=>{D=d;lsSet(LS.data,d);(d.vistos||[]).forEach(id=>VISTOS.add(id));lsSet(LS.vistos,[...VISTOS]);render()}).catch(e=>{
+    const m=String(e.message||e);
+    if(m.includes('SESION')){[LS.tok,LS.nom,LS.data,LS.vistos].forEach(lsDel);location.reload()}
+    else if(!D)$('#v-inicio').innerHTML='<div class="vacio">No se pudieron cargar los datos. Revisá la conexión y volvé a abrir la app.</div>';
+  });
+}
+
+/* ---------- Navegación ---------- */
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>ir(b.dataset.v));
+function ir(v){
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  ['inicio','ruta','muro','mias'].forEach(x=>$('#v-'+x).classList.toggle('hidden',x!==v));
+  scrollTo(0,0);logEv('Vista',v);
+}
+const nuevas=()=>D?D.feed.filter(x=>!x.mia&&!VISTOS.has(x.id)):[];
+function actualizarNuevas(){
+  const n=nuevas().length,d=$('#dotMuro');if(d){d.textContent=n;d.classList.toggle('hidden',!n)}
+  const box=$('#nvN');if(box){box.textContent=n;box.classList.toggle('cero',!n)}
+}
+function render(){if(!D)return;const on=!!(D.config&&D.config.carga);$('#fab').classList.toggle('hidden',!on);renderInicio();renderRuta();renderMuro();renderMias();actualizarNuevas()}
+
+/* ---------- Tarjeta ---------- */
+function card(it,src){
+  const c=tcol(it.tema),nueva=!it.mia&&!VISTOS.has(it.id);
+  return `<article class="card${it.dest?' dest':''}" data-id="${it.id}" data-src="${src}" style="--tc:${c}">
+   <div class="ch"><div class="tile">${ico(it.tema)}</div><div><h3>${esc(it.tit)}</h3>
+   <div class="meta"><span>${ico('pin')}${esc(it.ubi)}</span><span>${ico('cal')}${fDia(it.dia)}</span></div></div></div>
+   <div class="bk"><b>Qué se vio</b><p>${esc(it.prob)}</p></div>
+   ${it.sug?`<div class="bk hacer"><b>Qué hacer</b><p>${esc(it.sug)}</p></div>`:''}
+   <div class="tags">${nueva?'<span class="tag nueva">Nueva</span>':''}${it.dest?'<span class="tag dst">Destacada</span>':''}<span class="tag">${esc(it.tema)}</span><span class="tag">${esc(it.clase)}</span>${it.pend?'<span class="tag nueva">Pendiente de envío</span>':it.mia?'<span class="tag mia">Tuya</span>':''}</div>
+  </article>`;
+}
+
+/* ---------- Inicio ---------- */
+function ring(n,meta){
+  const p=Math.min(n/meta,1),R=52,Cc=2*Math.PI*R,col=n>=meta?'var(--green)':n>=1?'var(--amber)':'var(--red)';
+  return `<svg class="ring" viewBox="0 0 130 130" role="img" aria-label="${n} de ${meta} proactivas este mes">
+   <circle cx="65" cy="65" r="${R}" fill="none" stroke="#E4E7EB" stroke-width="12"/>
+   <circle cx="65" cy="65" r="${R}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${Cc*p} ${Cc}" transform="rotate(-90 65 65)"/>
+   <text x="65" y="66" text-anchor="middle" class="rn">${n}</text><text x="65" y="88" text-anchor="middle" class="rd">de ${meta}</text></svg>`;
+}
+function mesesNorma(){
+  const out=[];let[y,m]=D.cat.inicio.split('-').map(Number);const fin=ymLocal();
+  for(let k=0;k<120;k++){const ym=y+'-'+String(m).padStart(2,'0');if(ym>fin)break;out.push(ym);m++;if(m>12){m=1;y++}}
+  return out;
+}
+function renderInicio(){
+  const pend=lsGet(LS.ncola,[]),pendMes=pend.filter(x=>ymDe(x.ts)===ymLocal()).length,carga=!!(D.config&&D.config.carga);
+  const meta=D.cat.meta,hoy=ymLocal(),n=(D.porMes[hoy]||0)+pendMes,falta=Math.max(meta-n,0),mes=mesNom(hoy);
+  const d=new Date(),ult=new Date(d.getFullYear(),d.getMonth()+1,0).getDate(),dias=ult-d.getDate();
+  const cuando=dias===0?'Hoy es el último día del mes.':`Quedan ${dias} ${dias===1?'día':'días'} para completarlas.`;
+  const titulo=falta===0?'¡Felicitaciones! Cumpliste el mínimo de '+mes:`Te ${falta===1?'falta 1 proactiva':'faltan '+falta+' proactivas'} de ${mes}`;
+  const bajada=falta===0?'Podés seguir cargando todas las que encuentres: cada una ayuda a otro conductor.':`${cuando} ${carga?'Cargalas desde Ruta Sky o acá mismo, con tu voz.':'Se cargan desde la app de Ruta Sky, la misma del plan de viaje.'}`;
+  const rachaHtml=mesesNorma().map(m=>{const c=D.porMes[m]||0,cl=c>=meta?'ok':(m===hoy?'':'no');return `<div class="${cl}">${MES_C[+m.split('-')[1]-1]} ${c}/${meta}</div>`}).join('');
+
+  const temas={};D.feed.forEach(x=>temas[x.tema]=(temas[x.tema]||0)+1);
+  const temasHtml=Object.keys(temas).sort((a,b)=>temas[b]-temas[a]).map(t=>
+    `<button data-tema="${esc(t)}"><div class="tile" style="--tc:${tcol(t)}">${ico(t)}</div>${esc(t)}<span class="cnt">${temas[t]}</span></button>`).join('');
+  const dest=D.feed.find(x=>x.dest);
+  const ubis={};D.feed.forEach(x=>{if(x.ubi&&x.ubi!=='Propuesta general')ubis[x.ubi]=(ubis[x.ubi]||0)+1});
+  const top=Object.entries(ubis).sort((a,b)=>b[1]-a[1]).slice(0,6),max=top.length?top[0][1]:1;
+
+  $('#v-inicio').innerHTML=`
+   <div class="panel"><div class="hero">${ring(n,meta)}<div><h1>${titulo}</h1><p>${bajada}</p></div></div>
+    <div class="racha">${rachaHtml}</div>
+    ${carga?`<div class="nuevas-acc"><button class="btnp" id="bCargar">${ico('mic')}Cargar una proactiva</button></div>`:''}</div>
+   ${pendHtml()}
+   <h2>Nuevas para vos</h2>
+   <div class="panel"><div class="nuevas"><div class="n" id="nvN">0</div><p id="nvTxt"></p></div>
+    <div class="nuevas-acc"><button class="btnp" id="bNuevas">${ico('play')}Ver las nuevas</button><button class="btns" id="bTodo">${ico('muro')}Ver todo el muro</button></div></div>
+   <h2>Proactivas de la flota</h2>
+   <div class="temas"><button data-tema=""><div class="tile" style="--tc:var(--ink)">${ico('grid')}</div>Todas<span class="cnt">${D.feed.length}</span></button>${temasHtml}</div>
+   ${dest?`<h2>Destacada</h2><div id="destBox">${card(dest,'Inicio')}</div>`:''}
+   ${top.length?`<h2>Lugares más reportados</h2><div class="panel hot">${top.map(([u,c])=>`<div class="row"><span>${esc(u)}</span><strong>${c}</strong><div class="b"><i style="width:${c/max*100}%"></i></div></div>`).join('')}</div>`:''}`;
+  const nv=nuevas().length;
+  $('#nvTxt').textContent=nv?`${nv===1?'proactiva nueva':'proactivas nuevas'} de tus compañeros que todavía no viste.`:'Estás al día: ya viste todas las proactivas publicadas.';
+  $('#bNuevas').classList.toggle('hidden',!nv);
+  $('#bNuevas').onclick=()=>abrirVisor(nuevas(),'Nuevas');
+  $('#bTodo').onclick=()=>ir('muro');
+  if($('#bCargar'))$('#bCargar').onclick=abrirNueva;
+  document.querySelectorAll('#v-inicio .temas button').forEach(b=>b.onclick=()=>{
+    const t=b.dataset.tema;abrirVisor(t?D.feed.filter(x=>x.tema===t):D.feed,t||'Todas');
+  });
+  observar($('#v-inicio'));
+}
+
+/* ---------- Ruta (corredor) ---------- */
+function renderRuta(){
+  const cnt={},rec={},hace60=new Date(Date.now()-60*864e5).toISOString().slice(0,10);
+  D.feed.forEach(x=>{cnt[x.zona]=(cnt[x.zona]||0)+1;if(x.dia>=hace60)rec[x.zona]=(rec[x.zona]||0)+1});
+  const X=196;
+  const nodo=(z,u)=>{
+    const n=cnt[z]||0,r=14+Math.min(n,12)*1.1,rr=rec[z]||0,st=rr>=3?'var(--red)':rr>=1?'var(--amber)':'#B8C0C8',x=u.x||X,sel=zonaSel===z;
+    const lx=u.x?x:x-r-12,anc=u.x?'middle':'end',ly=u.x?u.y+r+18:u.y-2;
+    return `<g class="node" data-z="${esc(z)}" tabindex="0" role="button" aria-label="${esc(z)}: ${n} proactivas">
+      <circle cx="${x}" cy="${u.y}" r="${r}" fill="${sel?'#1F2328':'#fff'}" stroke="${st}" stroke-width="5"/>
+      <text x="${x}" y="${u.y+6}" text-anchor="middle" font-size="17" font-weight="700" fill="${sel?'#fff':'#1F2328'}">${n}</text>
+      <text x="${lx}" y="${ly}" text-anchor="${anc}" font-size="15" font-weight="700" fill="#1F2328">${esc(u.l[0])}</text>
+      <text x="${lx}" y="${ly+17}" text-anchor="${anc}" font-size="12.5" fill="#5F6B78">${esc(u.l[1])}</text></g>`;
+  };
+  const camino=`M${X} 18 L${X} 612`,rama=`M${X} 410 C ${X+60} 420, 300 440, 300 490`;
+  const truck=REDUCE?'':`<g><g transform="translate(-13 -13) scale(1.1)" stroke="#fff" stroke-width="1.8" fill="#C00000" stroke-linejoin="round"><rect x="2" y="6" width="12" height="10" rx="1.5"/><path d="M14 9.5h4l3 3.2V16h-7z"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></g><animateMotion dur="3.4s" fill="freeze" path="M0 0 L0 560"/></g>`;
+  const lista=zonaSel?D.feed.filter(x=>x.zona===zonaSel):[];
+  $('#v-ruta').innerHTML=`
+   <h2 style="margin-top:4px">El corredor, según los conductores</h2>
+   <div class="mapa"><svg viewBox="0 0 360 640" role="img" aria-label="Mapa del corredor Arroyo Seco a Mendoza y San Juan">
+     <path d="${rama}" fill="none" stroke="#3A3F45" stroke-width="16" stroke-linecap="round"/>
+     <path d="${rama}" fill="none" stroke="#F2C230" stroke-width="2" stroke-dasharray="9 8"/>
+     <path d="${camino}" fill="none" stroke="#3A3F45" stroke-width="20" stroke-linecap="round"/>
+     <path d="${camino}" fill="none" stroke="#F2C230" stroke-width="2.4" stroke-dasharray="11 9"/>
+     ${Object.entries(ZONA_UI).map(([z,u])=>nodo(z,u)).join('')}
+     <g transform="translate(${X} 22)">${truck}</g>
+   </svg></div>
+   <div class="leyenda"><span><i style="border-color:var(--red)"></i>3 o más en 60 días</span><span><i style="border-color:var(--amber)"></i>1 o 2 en 60 días</span><span><i style="border-color:#B8C0C8"></i>Sin reportes recientes</span></div>
+   <button class="chip ${zonaSel===GEN?'on':''}" id="bGen">${ico('compass')}Otras rutas y propuestas generales (${cnt[GEN]||0})</button>
+   <div id="rLista">${zonaSel?`<h2>${esc(zonaSel)}</h2>${lista.length?`<div class="lista">${lista.map(x=>card(x,'Ruta')).join('')}</div>`:'<div class="vacio">Sin proactivas publicadas en esta zona.</div>'}`:'<p style="color:var(--muted)">Tocá una parada del corredor para ver sus proactivas.</p>'}</div>`;
+  const sel=z=>{zonaSel=zonaSel===z?null:z;logEv('Zona',zonaSel||'');renderRuta();if(zonaSel)$('#rLista').scrollIntoView({behavior:REDUCE?'auto':'smooth'})};
+  document.querySelectorAll('#v-ruta .node').forEach(g=>{g.onclick=()=>sel(g.dataset.z);g.onkeydown=e=>{if(e.key==='Enter')sel(g.dataset.z)}});
+  $('#bGen').onclick=()=>sel(GEN);
+  observar($('#v-ruta'));
+}
+
+/* ---------- Muro ---------- */
+function renderMuro(){
+  const ambs=['Todos',...D.cat.ambitos];
+  const temas=[...new Set(D.feed.map(x=>x.tema))].sort();
+  const q=filtro.q.toLowerCase();
+  const l=D.feed.filter(x=>(filtro.amb==='Todos'||x.amb===filtro.amb)&&(!filtro.tema||x.tema===filtro.tema)&&
+    (!filtro.solo||(!x.mia&&!VISTOS.has(x.id)))&&(!q||(x.tit+' '+x.prob+' '+x.sug+' '+x.ubi).toLowerCase().includes(q)));
+  $('#v-muro').innerHTML=`
+   <div class="filtros"><div class="chips">${ambs.map(a=>`<button class="chip ${filtro.amb===a?'on':''}" data-a="${esc(a)}">${esc(a==='Playa de estacionamiento'?'Playa':a)}</button>`).join('')}</div>
+    <div class="fila"><select id="fTema" aria-label="Tema"><option value="">Todos los temas</option>${temas.map(t=>`<option ${filtro.tema===t?'selected':''}>${esc(t)}</option>`).join('')}</select>
+    <select id="fSolo" aria-label="Mostrar"><option value="">Todas</option><option value="1" ${filtro.solo?'selected':''}>Solo nuevas</option></select></div>
+    <div class="fila"><input id="fQ" type="search" placeholder="Buscar lugar o palabra" value="${esc(filtro.q)}"></div></div>
+   <p style="color:var(--muted);margin:4px 2px 10px">${l.length} proactivas</p>
+   ${l.length?`<div class="lista">${l.map(x=>card(x,'Muro')).join('')}</div>`:'<div class="vacio">No hay proactivas con estos filtros.</div>'}`;
+  document.querySelectorAll('#v-muro .chip').forEach(b=>b.onclick=()=>{filtro.amb=b.dataset.a;renderMuro()});
+  $('#fTema').onchange=e=>{filtro.tema=e.target.value;renderMuro()};
+  $('#fSolo').onchange=e=>{filtro.solo=e.target.value;renderMuro()};
+  $('#fQ').oninput=e=>{filtro.q=e.target.value;clearTimeout(window._qt);window._qt=setTimeout(()=>{renderMuro();const i=$('#fQ');i.focus();i.setSelectionRange(i.value.length,i.value.length)},350)};
+  observar($('#v-muro'));
+}
+
+/* ---------- Mías ---------- */
+function renderMias(){
+  const pend=lsGet(LS.ncola,[]).map(x=>({id:'',dia:diaDe(x.ts),tit:x.tit,ubi:x.ubi,tema:x.tema,clase:x.clase,prob:x.prob,sug:x.sug,mia:true,pend:true}));
+  const l=pend.concat(D.mias.map(x=>Object.assign({},x,{mia:true})));
+  $('#v-mias').innerHTML=`<h2 style="margin-top:4px">Mis proactivas</h2>
+   <p style="color:var(--muted);margin-top:-4px">Solo vos ves esta lista. En el muro aparecen sin tu nombre.</p>${pendHtml()}
+   ${l.length?`<div class="lista">${l.map(x=>card(x,'Mías')).join('')}</div>`
+   :`<div class="vacio">Todavía no tenés proactivas cargadas. Cargalas desde la app de Ruta Sky${D.config&&D.config.carga?' o con el botón "Nueva proactiva"':''}.</div>`}`;
+}
+
+/* ---------- Visor de proactivas ---------- */
+const S={l:[],i:0,t:null};
+function abrirVisor(list,nombre){
+  if(!list.length)return;
+  S.l=list.slice(0,40);S.i=0;$('#story').classList.remove('hidden');document.body.style.overflow='hidden';
+  logEv('Proactivas de la flota',nombre);mostrar();
+}
+function mostrar(){
+  clearTimeout(S.t);const it=S.l[S.i];
+  $('#story').style.setProperty('--sc',tcol(it.tema));
+  $('#sBars').innerHTML=S.l.map((_,i)=>`<div class="${i<S.i?'done':i===S.i?'cur':''}"><i></i></div>`).join('');
+  $('#sCont').textContent=`${S.i+1} de ${S.l.length}`;
+  $('#sBody').innerHTML=`<div class="big">${ico(it.tema)}</div><div class="ubi">${ico('pin')}${esc(it.ubi)}, ${fDia(it.dia)}</div>
+   <h2>${esc(it.tit)}</h2><p>${esc(it.prob)}</p>${it.sug?`<div class="hacer"><b>Qué hacer</b>${esc(it.sug)}</div>`:''}`;
+  $('#sPrevB').style.visibility=S.i?'visible':'hidden';
+  $('#sNextB').innerHTML=(S.i<S.l.length-1?'Siguiente':'Terminar')+ico('next');
+  if(!it.mia)marcarVisto(it.id,'Proactivas de la flota');
+  if(!REDUCE)S.t=setTimeout(sig,9000);
+}
+function sig(){if(S.i<S.l.length-1){S.i++;mostrar()}else cerrar()}
+function ant(){if(S.i>0){S.i--;mostrar()}}
+function cerrar(){clearTimeout(S.t);$('#story').classList.add('hidden');document.body.style.overflow='';renderInicio();renderMuro();actualizarNuevas()}
+$('#sNext').onclick=sig;$('#sPrev').onclick=ant;$('#sNextB').onclick=sig;$('#sPrevB').onclick=ant;$('#sClose').onclick=cerrar;
+addEventListener('keydown',e=>{if($('#story').classList.contains('hidden'))return;if(e.key==='ArrowRight')sig();if(e.key==='ArrowLeft')ant();if(e.key==='Escape')cerrar()});
+
+/* ---------- Nueva proactiva (voz o texto) ---------- */
+const ymDe=ts=>{const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+const diaDe=ts=>{const d=new Date(ts);return ymDe(ts)+'-'+String(d.getDate()).padStart(2,'0')};
+function pendHtml(){
+  const n=lsGet(LS.ncola,[]).length,err=lsGet(LS.nerr,'');if(!n)return'';
+  return `<div class="pend">${n===1?'1 proactiva pendiente de envío':n+' proactivas pendientes de envío'}. ${err?'No se pudo enviar: '+esc(err):navigator.onLine?'Enviando…':'Se envían solas cuando vuelva la señal.'}</div>`;
+}
+$('#fab').innerHTML=ico('plus')+'Nueva proactiva';$('#nfClose').innerHTML=ico('x');
+$('#fab').onclick=()=>abrirNueva();
+let USO_VOZ=false;
+function abrirNueva(){
+  USO_VOZ=false;$('#nfTxt').value='';$('#nfArmar').disabled=true;$('#nfErr').textContent='';
+  $('#nf1').classList.remove('hidden');$('#nf2').classList.add('hidden');
+  $('#nfSt').textContent=SR?'Tocá para hablar':'Para dictar, usá el micrófono del teclado del celular.';
+  $('#nfMic').innerHTML=ico('mic');$('#nfMic').classList.toggle('hidden',!SR);
+  $('#nf').classList.remove('hidden');document.body.style.overflow='hidden';logEv('Nueva proactiva','abrir');
+}
+function cerrarNueva(){pararMic();$('#nf').classList.add('hidden');document.body.style.overflow=''}
+$('#nfClose').onclick=()=>{if(($('#nfTxt').value.trim().length>10)&&!confirm('¿Descartar esta proactiva?'))return;cerrarNueva()};
+$('#nfTxt').oninput=()=>{$('#nfArmar').disabled=$('#nfTxt').value.trim().length<15};
+
+/* Reconocimiento de voz del navegador (necesita conexión). Si no está disponible, queda el dictado del teclado. */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null,grabando=false,base='';
+function pararMic(){grabando=false;try{rec&&rec.stop()}catch(e){};$('#nfMic').classList.remove('on');$('#nfMic').innerHTML=ico('mic')}
+$('#nfMic').onclick=()=>{
+  if(grabando){pararMic();$('#nfSt').textContent='Listo. Podés seguir hablando, corregir el texto o armar la proactiva.';return}
+  if(!navigator.onLine){$('#nfSt').textContent='Sin señal no se puede transcribir acá. Usá el micrófono del teclado o escribilo.';return}
+  rec=new SR();rec.lang='es-AR';rec.continuous=true;rec.interimResults=true;
+  base=$('#nfTxt').value.trim();base=base?base+' ':'';
+  rec.onresult=e=>{let fin='',tmp='';for(let i=0;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t+' ';else tmp+=t}
+    $('#nfTxt').value=(base+fin+tmp).replace(/\s+/g,' ').trimStart();USO_VOZ=true;$('#nfTxt').oninput()};
+  rec.onerror=e=>{const m=e.error==='not-allowed'||e.error==='service-not-allowed'?'El micrófono está bloqueado. Usá el micrófono del teclado del celular o escribilo.':e.error==='no-speech'?'No se escuchó nada. Probá de nuevo.':'No se pudo usar el micrófono ('+e.error+'). Usá el del teclado.';pararMic();$('#nfSt').textContent=m};
+  rec.onend=()=>{if(grabando){pararMic();$('#nfSt').textContent='Se cortó la grabación. Tocá de nuevo para seguir hablando.'}};
+  try{rec.start();grabando=true;$('#nfMic').classList.add('on');$('#nfMic').innerHTML=ico('stop');$('#nfSt').textContent='Escuchando… tocá de nuevo para terminar.'}
+  catch(e){$('#nfSt').textContent='No se pudo iniciar el micrófono. Usá el del teclado.'}
+};
+
+/* ---------- Desglose del mensaje en campos (reglas, funciona sin conexión) ---------- */
+const nrm=s=>String(s||'').split('').map(c=>(c.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()[0])||' ').join('');
+const cap=s=>{s=String(s||'').trim().replace(/^[,;.\s]+/,'');return s?s[0].toUpperCase()+s.slice(1):''};
+const punto=s=>{s=cap(s).replace(/[,;\s]+$/,'');return s&&!/[.!?]$/.test(s)?s+'.':s};
+const CUE=/\b(habria que|hay que|sugiero que|sugiero|sugerimos|recomiendo que|recomiendo|recomendaria|propongo que|propongo|pido que|solicito que|solicito|lo ideal seria|la solucion seria|la solucion es|para solucionarlo|para solucionar esto|para solucionar|deberian|deberia|tendrian que|tendria que|seria bueno|seria importante|seria ideal|estaria bueno|convendria|necesitamos que|hace falta que)\b/;
+const CUE_QUITAR=/^(habria que|hay que|sugiero que|sugiero|sugerimos|recomiendo que|recomiendo|recomendaria|propongo que|propongo|pido que|solicito que|solicito|lo ideal seria|la solucion seria|la solucion es|para solucionarlo|para solucionar esto|para solucionar|necesitamos que|hace falta que)\s*(que\s+)?/;
+const ZONA_R=[['San Juan',/san juan|gorriti|ramblon|albardon|santa lucia/],['Arroyo Seco',/arroyo seco|general lagos|pueblo esther|ravi[cz]+ini/],
+ ['RN 33 Firmat–Venado Tuerto',/firmat|venado|provincial 14|provincial 93|rp ?14|rp ?93/],['RN 33 Rufino',/rufino|amenabar|cabodevila|cabdevila/],
+ ['RN 7 Laboulaye–Vicuña Mackenna',/laboulaye|vicuna|mackenna|makenna|levalle|los olmos/],['Villa Mercedes',/villa mercedes|etanol/],
+ ['San Luis',/fame|san luis|la cumbre|chorrillo|fraga|daract/],['Desaguadero–La Paz',/desaguadero|la paz|catitas|pencoso/],
+ ['Gran Mendoza',/mendoza|lujan|tunuyan|palmira|guaymallen|godoy cruz|acceso sur|maipu/]];
+const TEMA_R=[['Animales sueltos',/animal|caballo|equino|vaca|chivo|perro/],['Obras y desvíos',/obra|desvio|rotonda|banderillero/],
+ ['Elementos de seguridad',/\bepp\b|arnes|barbijo|proteccion|casco|guantes|anteojos|chaleco/],['Paradas y descanso',/pernocte|parada|descanso|gnc|dormir/],
+ ['Señalización',/senal|cartel|rotul|barrera|calco|semaforo/],['Instalaciones',/bano|ducha|playa|estacionamiento|bascula|balanza|iluminacion|luz|luces de la/],
+ ['Equipos de carga y descarga',/balde|brazo|rejilla|manguera|respiradero|tapa|surtidor|valvula|pico/],['Terceros en la vía',/moto|motociclista|auto |autos|ciclista|peaton|camion de frente|adelant/],
+ ['Operación y demoras',/demora|prioridad|horario|espera|saldo|turno/],['Calzada',/pozo|bache|calzada|asfalto|banquina|ondulacion|huella|ruta/],['Capacitación',/capacitacion|curso|taller|simulador|entrenamiento/]];
+const AMB_R=[['Playa de estacionamiento',/playa|estacionamiento/],['Descarga',/descarg|estacion de servicio|\beess\b|tanque|boca de/],
+ ['Carga',/isla de carga|cargando|brazo de carga|planta de carga|\bcarga\b|balanza|bascula|\bfame\b|etanol/],
+ ['Tránsito',/ruta|\bkm\b|kilometro|rotonda|peaje|banquina|calzada|desvio|autopista|\brn\b|animal|caballo|vaca|moto/]];
+const STOP=new Set(['villa','mercedes','ruta','planta','playa','estacion','calle','ingreso','salida','acceso','tramo','general','propuesta','descarga','carga','mendoza','luis','juan','sugerido','sugerida']);
+function buscarUbi(t){
+  const ubis=[...new Set([...(D.feed||[]),...(D.mias||[])].map(x=>x.ubi).filter(u=>u&&u!=='Propuesta general'&&u!=='Sin especificar'))];
+  let best=null,bs=0;
+  ubis.forEach(u=>{const toks=nrm(u).split(/[^a-z0-9]+/).filter(w=>w.length>=4||/^\d+$/.test(w));
+    const dist=toks.filter(w=>!STOP.has(w)&&!/^\d+$/.test(w));if(!dist.length)return;
+    const hitD=dist.filter(w=>t.includes(w)).length;if(!hitD||hitD/dist.length<0.6)return;
+    const sc=hitD*2+toks.filter(w=>t.includes(w)).length-u.length/200;if(sc>bs){bs=sc;best=u}});
+  return best;
+}
+function titulo(x){
+  let s=String(x||'').split(/[.!?]/)[0].trim(),n=nrm(s);
+  const v=n.slice(0,80).match(/\b(hay|habia|se ve|vi que|vi)\s+/);
+  if(v){s=s.slice(v.index+v[0].length)}
+  else{const l=n.match(/^(en|sobre|a la altura de|llegando a|saliendo de|entrando a|cerca de|por)\s+(?:\S+\s+){1,9}?(?=(el|la|los|las|un|una|falta|faltan|no hay)\s)/);if(l)s=s.slice(l[0].length)}
+  s=s.replace(/^(un|una|unos|unas)\s+/i,'');
+  if(s.length>50){const c=s.slice(20).search(/,|\s(y|que|porque|cuando)\s/);if(c>=0&&c+20<=60)s=s.slice(0,c+20)}
+  if(s.length>60)s=s.slice(0,60).replace(/\s+\S*$/,'')+'…';
+  return cap(s.replace(/[,;\s]+$/,''));
+}
+function parsear(txt){
+  const raw=String(txt||'').replace(/\s+/g,' ').trim(),t=nrm(raw);
+  let prob=raw,sug='';
+  const m=t.match(CUE);
+  const quitar=x=>{const q=nrm(x).match(CUE_QUITAR);return q?x.slice(q[0].length):x};
+  if(m&&m.index>0){prob=raw.slice(0,m.index);sug=quitar(raw.slice(m.index))}
+  else if(m&&m.index===0){const pq=t.match(/\b(porque|ya que|dado que|debido a que)\b/);
+    if(pq){sug=quitar(raw.slice(0,pq.index));prob=raw.slice(pq.index+pq[0].length)}else{prob=raw;sug=''}}
+  prob=prob.replace(/[,;\s]*(y|entonces|por eso|asi que|por lo que)?[,;\s]*$/i,'');
+  const zona=(ZONA_R.find(([,re])=>re.test(t))||['Otras rutas y generales'])[0];
+  const tema=(TEMA_R.find(([,re])=>re.test(t))||['Operación y demoras'])[0];
+  const amb=(AMB_R.find(([,re])=>re.test(t))||['Otro'])[0];
+  const clase=/propongo|propuesta|seria bueno (agregar|incorporar|tener|sumar|poner|habilitar)|incorporar|habilitar como|capacitacion|curso|taller|simulador/.test(t)?'Propuesta de mejora'
+   :/no usa|no usaba|sin casco|sin luces|no respet|mal trato|maltrato|grosero|paso en rojo|cruzo en|no tenia puesto|no llevaba|a alta velocidad|exceso de velocidad|hablando por celular|con el celular|me encerro|se cruzo|invadio/.test(t)?'Acto inseguro':'Condición insegura';
+  const r=t.match(/\b(?:ruta|rn|r n)\s*(?:nacional\s*)?(?:n(?:umero|ro)?\.?\s*)?(\d{1,3})\b/),k=t.match(/\b(?:km|kilometro)\s*(\d{1,4})\b/);
+  let ubi=k?null:buscarUbi(t);
+  if(!ubi){if(r)ubi='RN '+r[1]+(k?' – km '+k[1]:(!/^RN|^Otras/.test(zona)?' – '+zona:''));else if(k)ubi='Km '+k[1];else ubi=buscarUbi(t)}
+  const tit=titulo(clase==='Propuesta de mejora'&&sug?sug:prob);
+  return {tit,ubi:ubi||'',amb,zona,tema,clase,prob:punto(prob),sug:punto(sug),orig:raw};
+}
+function llenarSel(id,list,val){$(id).innerHTML=list.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join('')}
+$('#nfArmar').onclick=()=>{
+  pararMic();const p=parsear($('#nfTxt').value);
+  $('#nfTit').value=p.tit;$('#nfUbi').value=p.ubi;$('#nfProb').value=p.prob;$('#nfSug').value=p.sug;$('#nfOrig').textContent=p.orig;
+  llenarSel('#nfAmb',D.cat.ambitos,p.amb);llenarSel('#nfZona',D.cat.zonas,p.zona);llenarSel('#nfTema',D.cat.temas,p.tema);llenarSel('#nfClase',D.cat.clases,p.clase);
+  $('#nf1').classList.add('hidden');$('#nf2').classList.remove('hidden');$('#nf').scrollTop=0;$('#nfErr').textContent='';
+};
+$('#nfVolver').onclick=()=>{$('#nf2').classList.add('hidden');$('#nf1').classList.remove('hidden')};
+$('#nfEnviar').onclick=()=>{
+  const o={cid:Date.now().toString(36)+Math.random().toString(36).slice(2,8),ts:Date.now(),voz:USO_VOZ,orig:$('#nfOrig').textContent,
+    tit:$('#nfTit').value.trim(),ubi:$('#nfUbi').value.trim(),amb:$('#nfAmb').value,zona:$('#nfZona').value,tema:$('#nfTema').value,clase:$('#nfClase').value,
+    prob:$('#nfProb').value.trim(),sug:$('#nfSug').value.trim()};
+  if(o.prob.length<10){$('#nfErr').textContent='Contá un poco más en "Qué viste".';return}
+  if(!o.ubi){$('#nfErr').textContent='Indicá la ubicación.';$('#nfUbi').focus();return}
+  if(!o.tit)o.tit=o.prob.replace(/\.$/,'').slice(0,60);
+  const c=lsGet(LS.ncola,[]);c.push(o);lsSet(LS.ncola,c);lsDel(LS.nerr);
+  logEv('Nueva proactiva',o.voz?'voz':'texto');cerrarNueva();render();
+  if(navigator.onLine){toast('Enviando tu proactiva…');flushNuevas()}else toast('Sin señal: se envía sola cuando vuelva la conexión.');
+};
+
+/* ---------- Arranque ---------- */
+if(lsGet(LS.tok,null))iniciar();else cargarNombres();
+setInterval(()=>{flush();flushNuevas()},60000);
+</script>
+</body>
+</html>
