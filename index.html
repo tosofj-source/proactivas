@@ -566,18 +566,44 @@ $('#nfTxt').oninput=()=>{$('#nfArmar').disabled=$('#nfTxt').value.trim().length<
 
 /* Reconocimiento de voz del navegador (necesita conexión). Si no está disponible, queda el dictado del teclado. */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-let rec=null,grabando=false,base='';
-function pararMic(){grabando=false;try{rec&&rec.stop()}catch(e){};$('#nfMic').classList.remove('on');$('#nfMic').innerHTML=ico('mic')}
+let rec=null,grabando=false,texto='',parcial='',silencios=0;
+/* Une una frase nueva al texto sin repetir lo que ya estaba (Chrome en Android a veces reenvía frases acumuladas). */
+function unir(a,b){
+  b=String(b||'').trim();if(!b)return a;a=String(a||'').trim();if(!a)return b;
+  const na=nrm(a).replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(),nb=nrm(b).replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  if(na.endsWith(nb))return a;
+  if(nb.startsWith(na))return b;
+  const wa=na.split(' '),wb=nb.split(' '),bw=b.split(/\s+/);
+  for(let k=Math.min(15,wa.length,wb.length);k>=2;k--){if(wa.slice(-k).join(' ')===wb.slice(0,k).join(' '))return a+' '+bw.slice(k).join(' ')}
+  return a+' '+b;
+}
+function mostrarTexto(){$('#nfTxt').value=(texto+(parcial?' '+parcial:'')).replace(/\s+/g,' ').trim();$('#nfTxt').oninput()}
+function pararMic(){grabando=false;try{rec&&rec.stop()}catch(e){};parcial='';$('#nfMic').classList.remove('on');$('#nfMic').innerHTML=ico('mic')}
+function escuchar(){
+  rec=new SR();rec.lang='es-AR';rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
+  rec.onresult=e=>{
+    const r=e.results[e.results.length-1],t=r[0].transcript;
+    if(r.isFinal){texto=unir(texto,t);parcial='';silencios=0}else parcial=t;
+    USO_VOZ=true;mostrarTexto();
+  };
+  rec.onerror=e=>{
+    if(e.error==='no-speech'||e.error==='aborted'){silencios++;return}
+    const m=e.error==='not-allowed'||e.error==='service-not-allowed'?'El micrófono está bloqueado. Usá el micrófono del teclado del celular o escribilo.':'No se pudo usar el micrófono ('+e.error+'). Usá el del teclado.';
+    pararMic();$('#nfSt').textContent=m;
+  };
+  rec.onend=()=>{
+    if(parcial){texto=unir(texto,parcial);parcial='';mostrarTexto()}
+    if(!grabando)return;
+    if(silencios>=2){pararMic();$('#nfSt').textContent='Se detuvo por silencio. Tocá de nuevo para seguir hablando.';return}
+    try{escuchar()}catch(e){pararMic()}
+  };
+  rec.start();
+}
 $('#nfMic').onclick=()=>{
   if(grabando){pararMic();$('#nfSt').textContent='Listo. Podés seguir hablando, corregir el texto o armar la proactiva.';return}
   if(!navigator.onLine){$('#nfSt').textContent='Sin señal no se puede transcribir acá. Usá el micrófono del teclado o escribilo.';return}
-  rec=new SR();rec.lang='es-AR';rec.continuous=true;rec.interimResults=true;
-  base=$('#nfTxt').value.trim();base=base?base+' ':'';
-  rec.onresult=e=>{let fin='',tmp='';for(let i=0;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t+' ';else tmp+=t}
-    $('#nfTxt').value=(base+fin+tmp).replace(/\s+/g,' ').trimStart();USO_VOZ=true;$('#nfTxt').oninput()};
-  rec.onerror=e=>{const m=e.error==='not-allowed'||e.error==='service-not-allowed'?'El micrófono está bloqueado. Usá el micrófono del teclado del celular o escribilo.':e.error==='no-speech'?'No se escuchó nada. Probá de nuevo.':'No se pudo usar el micrófono ('+e.error+'). Usá el del teclado.';pararMic();$('#nfSt').textContent=m};
-  rec.onend=()=>{if(grabando){pararMic();$('#nfSt').textContent='Se cortó la grabación. Tocá de nuevo para seguir hablando.'}};
-  try{rec.start();grabando=true;$('#nfMic').classList.add('on');$('#nfMic').innerHTML=ico('stop');$('#nfSt').textContent='Escuchando… tocá de nuevo para terminar.'}
+  texto=$('#nfTxt').value.trim();parcial='';silencios=0;
+  try{escuchar();grabando=true;$('#nfMic').classList.add('on');$('#nfMic').innerHTML=ico('stop');$('#nfSt').textContent='Escuchando… hablá de corrido y tocá de nuevo para terminar.'}
   catch(e){$('#nfSt').textContent='No se pudo iniciar el micrófono. Usá el del teclado.'}
 };
 
